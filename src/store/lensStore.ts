@@ -2,7 +2,14 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { DEFAULT_NETWORKS } from './types'
+import {
+  DEFAULT_NETWORK_CONFIG,
+  NETWORK_CONFIG_STORAGE_KEY,
+  createSafeStorage,
+  mergeNetworkConfig,
+} from './persistence'
 
+import type { PersistedState } from './persistence'
 import type {
   ExpandedNodesSlice,
   LedgerDataSlice,
@@ -13,10 +20,8 @@ import type {
   NetworkConfigSlice,
 } from './types'
 
-/**
- * Default initial state
- */
-const DEFAULT_NETWORK_CONFIG: NetworkConfig = DEFAULT_NETWORKS.futurenet
+// Re-export for backwards compatibility
+export { DEFAULT_NETWORKS }
 
 /**
  * Network config slice creator
@@ -126,30 +131,33 @@ const createExpandedNodesSlice = (
 })
 
 /**
- * Combined Lens Store with persistence
+ * Combined Lens Store with persistence for networkConfig only
  *
  * Centralized state management for Soroban State Lens.
  * Includes slices for:
- * - networkConfig: Current network configuration (persisted)
- * - ledgerData: Cached ledger entries (not persisted)
- * - expandedNodes: Tree view expansion state (persisted)
+ * - networkConfig: Current network configuration (PERSISTED)
+ * - ledgerData: Cached ledger entries (NOT persisted)
+ * - expandedNodes: Tree view expansion state (NOT persisted)
  */
 export const useLensStore = create<LensStore>()(
-  persist(
+  persist<LensStore, [], [], PersistedState>(
     (set) => ({
       ...createNetworkConfigSlice(set),
       ...createLedgerDataSlice(set),
       ...createExpandedNodesSlice(set),
     }),
     {
-      name: 'soroban-state-lens-storage',
-      partialize: (state) => ({
-        networkConfig: state.networkConfig,
-        lastCustomUrl: state.lastCustomUrl,
-        expandedNodes: state.expandedNodes,
+      name: NETWORK_CONFIG_STORAGE_KEY,
+      storage: createSafeStorage<PersistedState>(),
+      // Only persist networkConfig slice
+      partialize: (state): PersistedState => ({ networkConfig: state.networkConfig }),
+      // Validate and merge persisted data safely
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...mergeNetworkConfig(persistedState, currentState),
       }),
-    },
-  ),
+    }
+  )
 )
 
 /**

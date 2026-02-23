@@ -4,8 +4,8 @@
  */
 
 export interface FootprintKeys {
-  readOnly: string[]
-  readWrite: string[]
+  readOnly: Array<string>
+  readWrite: Array<string>
 }
 
 /**
@@ -13,8 +13,8 @@ export interface FootprintKeys {
  * Returns stable ordered, deduplicated read/write key lists
  */
 export function extractFootprintKeys(footprint?: {
-  readOnly?: string[]
-  readWrite?: string[]
+  readOnly?: Array<string>
+  readWrite?: Array<string>
 } | null): FootprintKeys {
   if (!footprint) {
     return { readOnly: [], readWrite: [] }

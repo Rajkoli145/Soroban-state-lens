@@ -5,12 +5,12 @@
 
 export interface SimulateTransactionResponse {
   results?: Array<{
-    auth?: unknown[]
+    auth?: Array<unknown>
     xdr?: string
   }>
   footprint?: {
-    readOnly?: string[]
-    readWrite?: string[]
+    readOnly?: Array<string>
+    readWrite?: Array<string>
   }
   error?: string
   latestLedger?: number
@@ -20,12 +20,12 @@ export interface SimulateTransactionResult {
   success: boolean
   latestLedger?: number
   results?: Array<{
-    auth?: unknown[]
+    auth?: Array<unknown>
     xdr?: string
   }>
   footprint?: {
-    readOnly: string[]
-    readWrite: string[]
+    readOnly: Array<string>
+    readWrite: Array<string>
   }
   error?: string
 }

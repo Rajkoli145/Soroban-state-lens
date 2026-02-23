@@ -13,27 +13,27 @@
  */
 export function normalizeRpcUrl(raw: string): string {
   if (!raw || raw.trim() === '') {
-    return '';
+    return ''
   }
 
   try {
-    const url = new URL(raw.trim());
+    const url = new URL(raw.trim())
 
     // URL constructor handles lowercasing the protocol and basic normalization.
     // We need to construct the result carefully to handle trailing slashes.
 
-    let normalized = url.protocol + '//' + url.host + url.pathname;
+    let normalized = url.protocol + '//' + url.host + url.pathname
 
     // Remove trailing slashes from the pathname part
     while (normalized.endsWith('/')) {
-      normalized = normalized.slice(0, -1);
+      normalized = normalized.slice(0, -1)
     }
 
     // Append search and hash if present
-    normalized += url.search + url.hash;
+    normalized += url.search + url.hash
 
-    return normalized;
+    return normalized
   } catch {
-    return '';
+    return ''
   }
 }
